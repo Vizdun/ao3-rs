@@ -8,6 +8,10 @@ pub fn parse_work(html: &str) -> Work {
 
     let fragment = Html::parse_fragment(&html);
 
+    let id_selector = Selector::parse("li.chapter.bychapter > a").unwrap();
+    let title_selector = Selector::parse("h2.title").unwrap();
+    let author_selector = Selector::parse("h3.byline.heading > a[rel=author]").unwrap();
+    let summary_selector = Selector::parse("blockquote.userstuff").unwrap();
     let rating_selector = Selector::parse("dd.rating a").unwrap();
     let warning_selector = Selector::parse("dd.warning a").unwrap();
     let category_selector = Selector::parse("dd.category a").unwrap();
@@ -22,10 +26,6 @@ pub fn parse_work(html: &str) -> Work {
     let chapters_selector = Selector::parse("dd.chapters").unwrap();
     let kudos_selector = Selector::parse("dd.kudos").unwrap();
     let hits_selector = Selector::parse("dd.hits").unwrap();
-
-    let title_selector = Selector::parse("h2.title").unwrap();
-    let author_selector = Selector::parse("h3.byline.heading > a[rel=author]").unwrap();
-    let summary_selector = Selector::parse("blockquote.userstuff").unwrap();
 
     let chapter_single_selector = Selector::parse("div#workskin").unwrap();
     let chapter_multiple_selector = Selector::parse("div#chapters > div.chapter").unwrap();
@@ -91,30 +91,42 @@ pub fn parse_work(html: &str) -> Work {
     };
 
     Work {
-        title: fragment
-            .select(&title_selector)
-            .next()
-            .unwrap()
-            .text()
-            .next()
-            .unwrap()
-            .trim()
-            .to_string(),
-        authors: fragment
-            .select(&author_selector)
-            .map(|a| a.text().collect())
-            .collect(),
-        summary: fragment
-            .select(&summary_selector)
-            .next()
-            .unwrap()
-            .text()
-            .map(|a| a.to_string())
-            .collect::<Vec<String>>()
-            .join("\n")
-            .trim()
-            .to_string(),
         metadata: WorkMetadata {
+            id: fragment
+                .select(&id_selector)
+                .next()
+                .unwrap()
+                .value()
+                .attr("href")
+                .unwrap()[7..]
+                .splitn(2, "/")
+                .next()
+                .unwrap()
+                .parse()
+                .unwrap(),
+            title: fragment
+                .select(&title_selector)
+                .next()
+                .unwrap()
+                .text()
+                .next()
+                .unwrap()
+                .trim()
+                .to_string(),
+            authors: fragment
+                .select(&author_selector)
+                .map(|a| a.text().collect())
+                .collect(),
+            summary: fragment
+                .select(&summary_selector)
+                .next()
+                .unwrap()
+                .text()
+                .map(|a| a.to_string())
+                .collect::<Vec<String>>()
+                .join("\n")
+                .trim()
+                .to_string(),
             rating: match fragment
                 .select(&rating_selector)
                 .next()

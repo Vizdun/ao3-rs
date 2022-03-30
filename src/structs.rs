@@ -23,6 +23,14 @@ pub struct ChapterCount {
 #[derive(Debug)]
 /// Metadata or the 'header' of a work
 pub struct WorkMetadata {
+    /// ID
+    pub id: u32,
+    /// Title
+    pub title: String,
+    /// Authors
+    pub authors: Vec<String>,
+    /// Summary
+    pub summary: String,
     /// Rating
     pub rating: Rating,
     /// Warnings
@@ -69,12 +77,6 @@ pub struct Chapter {
 #[derive(Debug)]
 /// A work
 pub struct Work {
-    /// Title of the work
-    pub title: String,
-    /// Authors of the work
-    pub authors: Vec<String>,
-    /// Summary of the work
-    pub summary: String,
     /// A struct containing information about the work's metadata
     pub metadata: WorkMetadata,
     /// Notes at the start of the work
@@ -96,7 +98,7 @@ impl Work {
         Work::parse(&html)
     }
 
-    /// Create url to a work from work's ID
+    /// Create url to a work from the work's ID
     pub fn url_from_id(id: u32) -> String {
         format!(
             "https://archiveofourown.org/works/{}?view_full_work=true&view_adult=true",
