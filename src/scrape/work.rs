@@ -1,7 +1,6 @@
 use scraper::ElementRef;
 
 use crate::models::{
-    language::Language,
     work::{
         Category, Chapter, ChapterCount, Date, NamedAuthor, Rating, Warning, Work, WorkAuthor,
         WorkMetadata,
@@ -11,7 +10,7 @@ use crate::models::{
 pub fn parse_work(html: &str) -> Work {
     use scraper::{Html, Selector};
 
-    let fragment = Html::parse_fragment(&html);
+    let fragment = Html::parse_fragment(html);
 
     let id_selector = Selector::parse("li.chapter.bychapter > a").unwrap();
     let title_selector = Selector::parse("h2.title").unwrap();
@@ -58,7 +57,7 @@ pub fn parse_work(html: &str) -> Work {
             .unwrap()
             .select(&any_selector);
 
-        while let Some(element) = fragments.next() {
+        for element in fragments.by_ref() {
             match element.value().name() {
                 "p" => {
                     out.push('\n');
@@ -82,7 +81,7 @@ pub fn parse_work(html: &str) -> Work {
             .text()
             .next()
             .unwrap()
-            .splitn(2, "/")
+            .splitn(2, '/')
             .collect::<Vec<&str>>();
 
         ChapterCount {
@@ -105,8 +104,7 @@ pub fn parse_work(html: &str) -> Work {
                             .next()?
                             .value()
                             .attr("href")
-                            .unwrap()[7..]
-                            .splitn(2, "/")
+                            .unwrap()[7..].split('/')
                             .next()
                             .unwrap()
                             .parse()
@@ -129,16 +127,13 @@ pub fn parse_work(html: &str) -> Work {
                 let v: Vec<WorkAuthor> = fragment
                     .select(&author_selector)
                     .map(|a| {
-                        let username = a.value().attr("href").unwrap()[7..]
-                            .splitn(2, "/")
+                        let username = a.value().attr("href").unwrap()[7..].split('/')
                             .next()
                             .unwrap()
                             .to_string();
 
                         let pseud = a.value().attr("href").unwrap()[7..]
-                            .splitn(3, "/")
-                            .skip(2)
-                            .next()
+                            .splitn(3, '/').nth(2)
                             .unwrap()
                             .to_string();
 
@@ -155,7 +150,7 @@ pub fn parse_work(html: &str) -> Work {
                     })
                     .collect();
 
-                if v.len() == 0 {
+                if v.is_empty() {
                     vec![WorkAuthor::Anonymous]
                 } else {
                     v
@@ -304,30 +299,20 @@ pub fn parse_work(html: &str) -> Work {
                 .parse()
                 .unwrap(),
         },
-        start_notes: match fragment.select(&start_notes_selector).next() {
-            Some(notes) => Some(
-                notes
+        start_notes: fragment.select(&start_notes_selector).next().map(|notes| notes
                     .text()
                     .map(|a| a.to_string())
                     .collect::<Vec<String>>()
                     .join("\n")
                     .trim()
-                    .to_string(),
-            ),
-            None => None,
-        },
-        end_notes: match fragment.select(&end_notes_selector).next() {
-            Some(notes) => Some(
-                notes
+                    .to_string()),
+        end_notes: fragment.select(&end_notes_selector).next().map(|notes| notes
                     .text()
                     .map(|a| a.to_string())
                     .collect::<Vec<String>>()
                     .join("\n")
                     .trim()
-                    .to_string(),
-            ),
-            None => None,
-        },
+                    .to_string()),
         chapters: match chapter_count.current {
             1 => fragment
                 .select(&chapter_single_selector)
@@ -343,31 +328,21 @@ pub fn parse_work(html: &str) -> Work {
                             .trim()
                             .to_string(),
                     ),
-                    start_notes: match p.select(&chapter_start_notes_selector).next() {
-                        Some(notes) => Some(
-                            notes
+                    start_notes: p.select(&chapter_start_notes_selector).next().map(|notes| notes
                                 .text()
                                 .map(|a| a.to_string())
                                 .collect::<Vec<String>>()
                                 .join("\n")
                                 .trim()
-                                .to_string(),
-                        ),
-                        None => None,
-                    },
+                                .to_string()),
                     body: parse_body(&p),
-                    end_notes: match p.select(&chapter_end_notes_selector).next() {
-                        Some(notes) => Some(
-                            notes
+                    end_notes: p.select(&chapter_end_notes_selector).next().map(|notes| notes
                                 .text()
                                 .map(|a| a.to_string())
                                 .collect::<Vec<String>>()
                                 .join("\n")
                                 .trim()
-                                .to_string(),
-                        ),
-                        None => None,
-                    },
+                                .to_string()),
                 })
                 .collect::<Vec<Chapter>>(),
             _ => fragment
@@ -381,35 +356,25 @@ pub fn parse_work(html: &str) -> Work {
                         .map(|a| a.to_string())
                         .collect::<Vec<String>>()
                         .join("\n")
-                        .splitn(2, ":")
+                        .splitn(2, ':')
                         .collect::<Vec<&str>>()
                         .get(1)
                         .map(|s| s.trim().to_string()),
-                    start_notes: match p.select(&chapter_start_notes_selector).next() {
-                        Some(notes) => Some(
-                            notes
+                    start_notes: p.select(&chapter_start_notes_selector).next().map(|notes| notes
                                 .text()
                                 .map(|a| a.to_string())
                                 .collect::<Vec<String>>()
                                 .join("\n")
                                 .trim()
-                                .to_string(),
-                        ),
-                        None => None,
-                    },
+                                .to_string()),
                     body: parse_body(&p),
-                    end_notes: match p.select(&chapter_end_notes_selector).next() {
-                        Some(notes) => Some(
-                            notes
+                    end_notes: p.select(&chapter_end_notes_selector).next().map(|notes| notes
                                 .text()
                                 .map(|a| a.to_string())
                                 .collect::<Vec<String>>()
                                 .join("\n")
                                 .trim()
-                                .to_string(),
-                        ),
-                        None => None,
-                    },
+                                .to_string()),
                 })
                 .collect::<Vec<Chapter>>(),
         },
