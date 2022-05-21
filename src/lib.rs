@@ -1,17 +1,14 @@
 #[cfg(test)]
 mod tests {
-    pub use {crate::enums::*, crate::structs::*};
+    use crate::models::work::Work;
 
     #[test]
     fn it_works() {
         // 28755084
         // 32138716
-        println!("{:#?}", Work::from_id(28755084).metadata.id);
+        println!("{:#?}", Work::from_id(28755084).metadata);
     }
 }
 
-mod enums;
-mod structs;
-pub use {enums::*, structs::*};
-
+pub mod models;
 mod scrape;

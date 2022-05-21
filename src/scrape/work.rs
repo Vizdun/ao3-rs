@@ -1,7 +1,6 @@
 use scraper::ElementRef;
 
-use crate::enums::*;
-use crate::structs::*;
+use crate::models::work::{Work, ChapterCount, WorkMetadata, Rating, Warning, Category, Date, Chapter};
 
 pub fn parse_work(html: &str) -> Work {
     use scraper::{Html, Selector};
