@@ -1,6 +1,6 @@
 use super::language::Language;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Work Author
 pub enum WorkAuthor {
     /// Anonymous
@@ -11,7 +11,7 @@ pub enum WorkAuthor {
     Named(NamedAuthor),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Named Author
 pub struct NamedAuthor {
     /// Pseud
@@ -20,7 +20,7 @@ pub struct NamedAuthor {
     pub username: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Ratings
 pub enum Rating {
     /// Not Rated
@@ -35,7 +35,7 @@ pub enum Rating {
     Explicit,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Archive Warnings
 pub enum Warning {
     /// Creator Chose Not To Use Archive Warnings
@@ -52,7 +52,7 @@ pub enum Warning {
     RapeNonCon,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Categories
 pub enum Category {
     /// F/F
@@ -69,7 +69,7 @@ pub enum Category {
     Other,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// A date
 pub struct Date {
     /// Year

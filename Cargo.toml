@@ -9,3 +9,4 @@ edition = "2021"
 scraper = "0.13.0"
 reqwest = { version = "0.11.6", features = ["blocking"] }
 chrono = "0.4.19"
+typed-builder = "0.10.0"
