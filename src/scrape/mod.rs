@@ -94,16 +94,16 @@ macro_rules! parse_try_into {
 pub(crate) use parse_try_into;
 
 macro_rules! parse_parse {
-  ($e:expr) => {
-      $e.next()
-      .unwrap()
-      .text()
-      .next()
-      .unwrap()
-      .to_string()
-      .parse()
-      .unwrap()
-  };
+    ($e:expr) => {
+        $e.next()
+            .unwrap()
+            .text()
+            .next()
+            .unwrap()
+            .to_string()
+            .parse()
+            .unwrap()
+    };
 }
 
 pub(crate) use parse_parse;
