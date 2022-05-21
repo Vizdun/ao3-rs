@@ -6,7 +6,10 @@ mod tests {
     fn it_works() {
         // 28755084
         // 32138716
-        println!("{:#?}", Work::from_id(28755084).metadata);
+        // 39123774
+        // println!("{:#?}", Work::from_id(28755084).metadata);
+        // println!("{:#?}", Work::from_id(39123774).metadata);
+        println!("{:#?}", Work::from_id(39120786).metadata);
     }
 }
 

@@ -1,6 +1,9 @@
 use scraper::ElementRef;
 
-use crate::models::work::{Work, ChapterCount, WorkMetadata, Rating, Warning, Category, Date, Chapter};
+use crate::models::work::{
+    Category, Chapter, ChapterCount, Date, NamedAuthor, Rating, Warning, Work, WorkAuthor,
+    WorkMetadata,
+};
 
 pub fn parse_work(html: &str) -> Work {
     use scraper::{Html, Selector};
@@ -91,18 +94,25 @@ pub fn parse_work(html: &str) -> Work {
 
     Work {
         metadata: WorkMetadata {
-            id: fragment
-                .select(&id_selector)
-                .next()
-                .unwrap()
-                .value()
-                .attr("href")
-                .unwrap()[7..]
-                .splitn(2, "/")
-                .next()
-                .unwrap()
-                .parse()
-                .unwrap(),
+            id: {
+                let scrape_title = || -> Option<u32> {
+                    Some(
+                        fragment
+                            .select(&id_selector)
+                            .next()?
+                            .value()
+                            .attr("href")
+                            .unwrap()[7..]
+                            .splitn(2, "/")
+                            .next()
+                            .unwrap()
+                            .parse()
+                            .unwrap(),
+                    )
+                };
+
+                scrape_title().unwrap_or(0) // TODO: handle this error
+            },
             title: fragment
                 .select(&title_selector)
                 .next()
@@ -112,10 +122,42 @@ pub fn parse_work(html: &str) -> Work {
                 .unwrap()
                 .trim()
                 .to_string(),
-            authors: fragment
-                .select(&author_selector)
-                .map(|a| a.text().collect())
-                .collect(),
+            authors: {
+                let v: Vec<WorkAuthor> = fragment
+                    .select(&author_selector)
+                    .map(|a| {
+                        let username = a.value().attr("href").unwrap()[7..]
+                            .splitn(2, "/")
+                            .next()
+                            .unwrap()
+                            .to_string();
+
+                        let pseud = a.value().attr("href").unwrap()[7..]
+                            .splitn(3, "/")
+                            .skip(2)
+                            .next()
+                            .unwrap()
+                            .to_string();
+
+                        if username == "orphan_account" {
+                            WorkAuthor::OrphanAccount
+                        } else {
+                            WorkAuthor::Named({
+                                NamedAuthor {
+                                    pseud: if pseud == username { None } else { Some(pseud) },
+                                    username,
+                                }
+                            })
+                        }
+                    })
+                    .collect();
+
+                if v.len() == 0 {
+                    vec![WorkAuthor::Anonymous]
+                } else {
+                    v
+                }
+            },
             summary: fragment
                 .select(&summary_selector)
                 .next()
@@ -286,15 +328,17 @@ pub fn parse_work(html: &str) -> Work {
             1 => fragment
                 .select(&chapter_single_selector)
                 .map(|p| Chapter {
-                    title: fragment
-                        .select(&title_selector)
-                        .next()
-                        .unwrap()
-                        .text()
-                        .next()
-                        .unwrap()
-                        .trim()
-                        .to_string(),
+                    title: Some(
+                        fragment
+                            .select(&title_selector)
+                            .next()
+                            .unwrap()
+                            .text()
+                            .next()
+                            .unwrap()
+                            .trim()
+                            .to_string(),
+                    ),
                     start_notes: match p.select(&chapter_start_notes_selector).next() {
                         Some(notes) => Some(
                             notes
@@ -334,9 +378,9 @@ pub fn parse_work(html: &str) -> Work {
                         .collect::<Vec<String>>()
                         .join("\n")
                         .splitn(2, ":")
-                        .collect::<Vec<&str>>()[1]
-                        .trim()
-                        .to_string(),
+                        .collect::<Vec<&str>>()
+                        .get(1)
+                        .map(|s| s.trim().to_string()),
                     start_notes: match p.select(&chapter_start_notes_selector).next() {
                         Some(notes) => Some(
                             notes

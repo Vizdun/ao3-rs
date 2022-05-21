@@ -1,4 +1,17 @@
 #[derive(Debug)]
+pub enum WorkAuthor {
+    Anonymous,
+    OrphanAccount,
+    Named(NamedAuthor),
+}
+
+#[derive(Debug)]
+pub struct NamedAuthor {
+    pub pseud: Option<String>,
+    pub username: String
+}
+
+#[derive(Debug)]
 /// Ratings
 pub enum Rating {
     /// Not Rated
@@ -75,7 +88,7 @@ pub struct WorkMetadata {
     /// Title
     pub title: String,
     /// Authors
-    pub authors: Vec<String>,
+    pub authors: Vec<WorkAuthor>,
     /// Summary
     pub summary: String,
     /// Rating
@@ -112,7 +125,7 @@ pub struct WorkMetadata {
 /// Chapter of a work
 pub struct Chapter {
     /// Title of the chapter
-    pub title: String,
+    pub title: Option<String>,
     /// Notes at the start of the chapter
     pub start_notes: Option<String>,
     /// Content/body of the chapter
