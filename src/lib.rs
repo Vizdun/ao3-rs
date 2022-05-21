@@ -1,6 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use crate::models::{search::SearchQuery, work::Work};
+    use crate::models::{
+        search::SearchQuery,
+        work::{Work, WorkMetadata},
+    };
 
     #[test]
     fn it_works() {
@@ -14,10 +17,9 @@ mod tests {
         println!(
             "{:#?}",
             SearchQuery::builder()
-                .title("wonsan")
-                .characters(["Kim Jong-Un".to_string()])
+                .tags(["Self-cest".to_string(), "Shameless Smut".to_string()])
                 .build()
-                .next()
+                .collect::<Vec<WorkMetadata>>()
         )
     }
 }

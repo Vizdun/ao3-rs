@@ -133,11 +133,33 @@ impl TryFrom<&str> for Date {
     type Error = ();
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        Ok(Date {
-            year: value[0..4].parse().or(Err(()))?,
-            month: value[5..7].parse().or(Err(()))?,
-            day: value[8..10].parse().or(Err(()))?,
-        })
+        match value.len() {
+            10 => Ok(Date {
+                year: value[0..4].parse().or(Err(()))?,
+                month: value[5..7].parse().or(Err(()))?,
+                day: value[8..10].parse().or(Err(()))?,
+            }),
+            11 => Ok(Date {
+                year: value[7..11].parse().or(Err(()))?,
+                month: match &value[3..6] {
+                    "Jan" => 1,
+                    "Feb" => 2,
+                    "Mar" => 3,
+                    "Apr" => 4,
+                    "May" => 5,
+                    "Jun" => 6,
+                    "Jul" => 7,
+                    "Aug" => 8,
+                    "Sep" => 9,
+                    "Oct" => 10,
+                    "Nov" => 11,
+                    "Dec" => 12,
+                    _ => Err(())?,
+                },
+                day: value[0..2].parse().or(Err(()))?,
+            }),
+            _ => Err(()),
+        }
     }
 }
 
@@ -148,6 +170,23 @@ pub struct ChapterCount {
     pub current: u32,
     /// Number of chapters the work plans to have
     pub planned: Option<u32>,
+}
+
+impl TryFrom<&str> for ChapterCount {
+    type Error = ();
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let chapters_arr = value.splitn(2, '/').collect::<Vec<&str>>();
+
+        Ok(ChapterCount {
+            current: chapters_arr[0].parse().unwrap(),
+            planned: if chapters_arr[1] != "?" {
+                Some(chapters_arr[1].parse().unwrap())
+            } else {
+                None
+            },
+        })
+    }
 }
 
 #[derive(Debug)]

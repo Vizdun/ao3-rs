@@ -1,10 +1,13 @@
-use std::{collections::HashSet, ops::Range};
+use std::{
+    collections::{HashSet, VecDeque},
+    ops::Range,
+};
 
 use typed_builder::TypedBuilder;
 
 mod url_rep;
 
-use crate::models::search::url_rep::UrlRep;
+use crate::{models::search::url_rep::UrlRep, scrape::search::parse_search_results};
 
 use super::{
     language::Language,
@@ -89,9 +92,9 @@ pub struct SearchQuery {
     pub sort_by: SortBy,
     pub sort_direction: SortDirection,
     #[builder(setter(skip))]
-    search_results: Vec<WorkMetadata>,
+    search_results: VecDeque<WorkMetadata>,
     #[builder(setter(skip))]
-    current_result: usize,
+    page: usize,
 }
 
 impl SearchQuery {
@@ -105,6 +108,7 @@ impl SearchQuery {
 
         format!(
             include_str!("search_url.txt"),
+            self.page,
             self.any,
             self.title,
             self.author,
@@ -136,14 +140,20 @@ impl Iterator for SearchQuery {
     type Item = WorkMetadata;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.current_result += 1;
+        let next = self.search_results.pop_front();
 
-        if self.search_results.len() <= self.current_result {
+        if next.is_none() {
             let html = reqwest::blocking::get(self.url()).unwrap().text().unwrap();
 
-            println!("{:#?}", self.url())
-        }
+            self.page += 1;
 
-        None
+            let results = parse_search_results(&html);
+
+            self.search_results.append(&mut VecDeque::from(results));
+
+            self.search_results.pop_front()
+        } else {
+            next
+        }
     }
 }
