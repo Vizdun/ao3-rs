@@ -1,8 +1,11 @@
 use scraper::ElementRef;
 
-use crate::models::work::{
-    Category, Chapter, ChapterCount, Date, NamedAuthor, Rating, Warning, Work, WorkAuthor,
-    WorkMetadata,
+use crate::models::{
+    language::Language,
+    work::{
+        Category, Chapter, ChapterCount, Date, NamedAuthor, Rating, Warning, Work, WorkAuthor,
+        WorkMetadata,
+    },
 };
 
 pub fn parse_work(html: &str) -> Work {
@@ -239,7 +242,8 @@ pub fn parse_work(html: &str) -> Work {
                 .next()
                 .unwrap()
                 .trim()
-                .to_string(),
+                .try_into()
+                .unwrap(),
             published: {
                 let published_str = fragment
                     .select(&published_selector)

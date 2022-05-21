@@ -1,3 +1,5 @@
+use super::language::Language;
+
 #[derive(Debug)]
 /// Work Author
 pub enum WorkAuthor {
@@ -15,7 +17,7 @@ pub struct NamedAuthor {
     /// Pseud
     pub pseud: Option<String>,
     /// Username
-    pub username: String
+    pub username: String,
 }
 
 #[derive(Debug)]
@@ -75,7 +77,7 @@ pub struct Date {
     /// Month
     pub month: u8,
     /// Day
-    pub day: u8
+    pub day: u8,
 }
 
 #[derive(Debug, Clone)]
@@ -113,7 +115,7 @@ pub struct WorkMetadata {
     /// Additional tags
     pub additional_tags: Vec<String>,
     /// Language
-    pub language: String,
+    pub language: Language,
     /// Published date
     pub published: Date,
     /// Updated date
@@ -182,7 +184,7 @@ impl Work {
     pub fn completed(&self) -> bool {
         match self.metadata.chapters.planned {
             Some(planned) => self.metadata.chapters.current == planned,
-            None => false
+            None => false,
         }
     }
 }
