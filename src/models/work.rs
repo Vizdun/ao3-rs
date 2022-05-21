@@ -1,13 +1,20 @@
 #[derive(Debug)]
+/// Work Author
 pub enum WorkAuthor {
+    /// Anonymous
     Anonymous,
+    /// orphan_acccount
     OrphanAccount,
+    /// Named Author
     Named(NamedAuthor),
 }
 
 #[derive(Debug)]
+/// Named Author
 pub struct NamedAuthor {
+    /// Pseud
     pub pseud: Option<String>,
+    /// Username
     pub username: String
 }
 
