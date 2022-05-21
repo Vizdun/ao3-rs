@@ -35,6 +35,21 @@ pub enum Rating {
     Explicit,
 }
 
+impl TryFrom<&str> for Rating {
+    type Error = ();
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
+            "Not Rated" => Ok(Rating::NotRated),
+            "General Audiences" => Ok(Rating::General),
+            "Teen And Up Audiences" => Ok(Rating::Teen),
+            "Mature" => Ok(Rating::Mature),
+            "Explicit" => Ok(Rating::Explicit),
+            _ => Err(()),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 /// Archive Warnings
 pub enum Warning {
@@ -50,6 +65,24 @@ pub enum Warning {
     Underage,
     /// Rape/Non-Con
     RapeNonCon,
+}
+
+impl TryFrom<&str> for Warning {
+    type Error = ();
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
+            "Creator Chose Not To Use Archive Warnings" => {
+                Ok(Warning::CreatorChoseNotToUseArchiveWarnings)
+            }
+            "No Archive Warnings Apply" => Ok(Warning::NoArchiveWarningsApply),
+            "Graphic Depictions Of Violence" => Ok(Warning::GraphicDepictionsOfViolence),
+            "Major Character Death" => Ok(Warning::MajorCharacterDeath),
+            "Underage" => Ok(Warning::Underage),
+            "Rape/Non-Con" => Ok(Warning::RapeNonCon),
+            _ => Err(()),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -69,6 +102,22 @@ pub enum Category {
     Other,
 }
 
+impl TryFrom<&str> for Category {
+    type Error = ();
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
+            "F/F" => Ok(Category::FF),
+            "F/M" => Ok(Category::FM),
+            "Gen" => Ok(Category::Gen),
+            "M/M" => Ok(Category::MM),
+            "Multi" => Ok(Category::Multi),
+            "Other" => Ok(Category::Other),
+            _ => Err(()),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 /// A date
 pub struct Date {
@@ -78,6 +127,18 @@ pub struct Date {
     pub month: u8,
     /// Day
     pub day: u8,
+}
+
+impl TryFrom<&str> for Date {
+    type Error = ();
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Ok(Date {
+            year: value[0..4].parse().or(Err(()))?,
+            month: value[5..7].parse().or(Err(()))?,
+            day: value[8..10].parse().or(Err(()))?,
+        })
+    }
 }
 
 #[derive(Debug, Clone)]

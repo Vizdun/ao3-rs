@@ -128,7 +128,7 @@ impl SearchQuery {
             self.sort_by.url(),
             self.sort_direction.url()
         )
-        .replace(" ", "+")
+        .replace(' ', "+")
     }
 }
 

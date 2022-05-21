@@ -1,11 +1,6 @@
 use scraper::ElementRef;
 
-use crate::models::{
-    work::{
-        Category, Chapter, ChapterCount, Date, NamedAuthor, Rating, Warning, Work, WorkAuthor,
-        WorkMetadata,
-    },
-};
+use crate::models::work::{Chapter, ChapterCount, NamedAuthor, Work, WorkAuthor, WorkMetadata};
 
 pub fn parse_work(html: &str) -> Work {
     use scraper::{Html, Selector};
@@ -104,7 +99,8 @@ pub fn parse_work(html: &str) -> Work {
                             .next()?
                             .value()
                             .attr("href")
-                            .unwrap()[7..].split('/')
+                            .unwrap()[7..]
+                            .split('/')
                             .next()
                             .unwrap()
                             .parse()
@@ -127,13 +123,15 @@ pub fn parse_work(html: &str) -> Work {
                 let v: Vec<WorkAuthor> = fragment
                     .select(&author_selector)
                     .map(|a| {
-                        let username = a.value().attr("href").unwrap()[7..].split('/')
+                        let username = a.value().attr("href").unwrap()[7..]
+                            .split('/')
                             .next()
                             .unwrap()
                             .to_string();
 
                         let pseud = a.value().attr("href").unwrap()[7..]
-                            .splitn(3, '/').nth(2)
+                            .splitn(3, '/')
+                            .nth(2)
                             .unwrap()
                             .to_string();
 
@@ -166,52 +164,22 @@ pub fn parse_work(html: &str) -> Work {
                 .join("\n")
                 .trim()
                 .to_string(),
-            rating: match fragment
+            rating: fragment
                 .select(&rating_selector)
                 .next()
                 .unwrap()
                 .text()
                 .next()
                 .unwrap()
-            {
-                "Not Rated" => Rating::NotRated,
-                "General Audiences" => Rating::General,
-                "Teen And Up Audiences" => Rating::Teen,
-                "Mature" => Rating::Mature,
-                "Explicit" => Rating::Explicit,
-                _ => {
-                    panic!["invalid rating"];
-                }
-            },
+                .try_into()
+                .unwrap(),
             warnings: fragment
                 .select(&warning_selector)
-                .map(|a| match a.text().collect::<String>().as_str() {
-                    "Creator Chose Not To Use Archive Warnings" => {
-                        Warning::CreatorChoseNotToUseArchiveWarnings
-                    }
-                    "No Archive Warnings Apply" => Warning::NoArchiveWarningsApply,
-                    "Graphic Depictions Of Violence" => Warning::GraphicDepictionsOfViolence,
-                    "Major Character Death" => Warning::MajorCharacterDeath,
-                    "Underage" => Warning::Underage,
-                    "Rape/Non-Con" => Warning::RapeNonCon,
-                    _ => {
-                        panic!["invalid warning"];
-                    }
-                })
+                .map(|a| a.text().collect::<String>().as_str().try_into().unwrap())
                 .collect(),
             categories: fragment
                 .select(&category_selector)
-                .map(|a| match a.text().collect::<String>().as_str() {
-                    "F/F" => Category::FF,
-                    "F/M" => Category::FM,
-                    "Gen" => Category::Gen,
-                    "M/M" => Category::MM,
-                    "Multi" => Category::Multi,
-                    "Other" => Category::Other,
-                    _ => {
-                        panic!["invalid warning"];
-                    }
-                })
+                .map(|a| a.text().collect::<String>().as_str().try_into().unwrap())
                 .collect(),
             fandoms: fragment
                 .select(&fandom_selector)
@@ -239,34 +207,19 @@ pub fn parse_work(html: &str) -> Work {
                 .trim()
                 .try_into()
                 .unwrap(),
-            published: {
-                let published_str = fragment
-                    .select(&published_selector)
-                    .next()
-                    .unwrap()
-                    .text()
-                    .next()
-                    .unwrap();
-
-                Date {
-                    year: published_str[0..4].parse().unwrap(),
-                    month: published_str[5..7].parse().unwrap(),
-                    day: published_str[8..10].parse().unwrap(),
-                }
-            },
-            updated: {
-                match fragment.select(&updated_selector).next() {
-                    Some(updated_str) => {
-                        let updated_str = updated_str.text().next().unwrap();
-                        Some(Date {
-                            year: updated_str[0..4].parse().unwrap(),
-                            month: updated_str[5..7].parse().unwrap(),
-                            day: updated_str[8..10].parse().unwrap(),
-                        })
-                    }
-                    None => None,
-                }
-            },
+            published: fragment
+                .select(&published_selector)
+                .next()
+                .unwrap()
+                .text()
+                .next()
+                .unwrap()
+                .try_into()
+                .unwrap(),
+            updated: fragment
+                .select(&updated_selector)
+                .next()
+                .map(|updated_str| updated_str.text().next().unwrap().try_into().unwrap()),
             words: fragment
                 .select(&words_selector)
                 .next()
@@ -299,20 +252,24 @@ pub fn parse_work(html: &str) -> Work {
                 .parse()
                 .unwrap(),
         },
-        start_notes: fragment.select(&start_notes_selector).next().map(|notes| notes
-                    .text()
-                    .map(|a| a.to_string())
-                    .collect::<Vec<String>>()
-                    .join("\n")
-                    .trim()
-                    .to_string()),
-        end_notes: fragment.select(&end_notes_selector).next().map(|notes| notes
-                    .text()
-                    .map(|a| a.to_string())
-                    .collect::<Vec<String>>()
-                    .join("\n")
-                    .trim()
-                    .to_string()),
+        start_notes: fragment.select(&start_notes_selector).next().map(|notes| {
+            notes
+                .text()
+                .map(|a| a.to_string())
+                .collect::<Vec<String>>()
+                .join("\n")
+                .trim()
+                .to_string()
+        }),
+        end_notes: fragment.select(&end_notes_selector).next().map(|notes| {
+            notes
+                .text()
+                .map(|a| a.to_string())
+                .collect::<Vec<String>>()
+                .join("\n")
+                .trim()
+                .to_string()
+        }),
         chapters: match chapter_count.current {
             1 => fragment
                 .select(&chapter_single_selector)
@@ -328,21 +285,25 @@ pub fn parse_work(html: &str) -> Work {
                             .trim()
                             .to_string(),
                     ),
-                    start_notes: p.select(&chapter_start_notes_selector).next().map(|notes| notes
-                                .text()
-                                .map(|a| a.to_string())
-                                .collect::<Vec<String>>()
-                                .join("\n")
-                                .trim()
-                                .to_string()),
+                    start_notes: p.select(&chapter_start_notes_selector).next().map(|notes| {
+                        notes
+                            .text()
+                            .map(|a| a.to_string())
+                            .collect::<Vec<String>>()
+                            .join("\n")
+                            .trim()
+                            .to_string()
+                    }),
                     body: parse_body(&p),
-                    end_notes: p.select(&chapter_end_notes_selector).next().map(|notes| notes
-                                .text()
-                                .map(|a| a.to_string())
-                                .collect::<Vec<String>>()
-                                .join("\n")
-                                .trim()
-                                .to_string()),
+                    end_notes: p.select(&chapter_end_notes_selector).next().map(|notes| {
+                        notes
+                            .text()
+                            .map(|a| a.to_string())
+                            .collect::<Vec<String>>()
+                            .join("\n")
+                            .trim()
+                            .to_string()
+                    }),
                 })
                 .collect::<Vec<Chapter>>(),
             _ => fragment
@@ -360,21 +321,25 @@ pub fn parse_work(html: &str) -> Work {
                         .collect::<Vec<&str>>()
                         .get(1)
                         .map(|s| s.trim().to_string()),
-                    start_notes: p.select(&chapter_start_notes_selector).next().map(|notes| notes
-                                .text()
-                                .map(|a| a.to_string())
-                                .collect::<Vec<String>>()
-                                .join("\n")
-                                .trim()
-                                .to_string()),
+                    start_notes: p.select(&chapter_start_notes_selector).next().map(|notes| {
+                        notes
+                            .text()
+                            .map(|a| a.to_string())
+                            .collect::<Vec<String>>()
+                            .join("\n")
+                            .trim()
+                            .to_string()
+                    }),
                     body: parse_body(&p),
-                    end_notes: p.select(&chapter_end_notes_selector).next().map(|notes| notes
-                                .text()
-                                .map(|a| a.to_string())
-                                .collect::<Vec<String>>()
-                                .join("\n")
-                                .trim()
-                                .to_string()),
+                    end_notes: p.select(&chapter_end_notes_selector).next().map(|notes| {
+                        notes
+                            .text()
+                            .map(|a| a.to_string())
+                            .collect::<Vec<String>>()
+                            .join("\n")
+                            .trim()
+                            .to_string()
+                    }),
                 })
                 .collect::<Vec<Chapter>>(),
         },
