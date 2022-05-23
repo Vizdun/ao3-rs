@@ -65,7 +65,7 @@ impl Display for Rating {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "strum", derive(strum::EnumIter))]
 /// Archive Warnings
 pub enum Warning {
@@ -114,7 +114,7 @@ impl Display for Warning {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "strum", derive(strum::EnumIter))]
 /// Categories
 pub enum Category {
