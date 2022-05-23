@@ -242,7 +242,7 @@ pub struct WorkMetadata {
     /// Authors
     pub authors: Vec<WorkAuthor>,
     /// Summary
-    pub summary: String,
+    pub summary: Option<String>,
     /// Rating
     pub rating: Rating,
     /// Warnings

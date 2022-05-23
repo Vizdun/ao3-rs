@@ -50,19 +50,17 @@ pub fn parse_authors(e: Select) -> Vec<WorkAuthor> {
     }
 }
 
-pub fn parse_summary(fragment: ElementRef) -> String {
+pub fn parse_summary(fragment: ElementRef) -> Option<String> {
     let summary_selector = Selector::parse("blockquote.userstuff").unwrap();
 
-    fragment
-        .select(&summary_selector)
-        .next()
-        .unwrap()
-        .text()
-        .map(|a| a.to_string())
-        .collect::<Vec<String>>()
-        .join("\n")
-        .trim()
-        .to_string()
+    fragment.select(&summary_selector).next().map(|n| {
+        n.text()
+            .map(|a| a.to_string())
+            .collect::<Vec<String>>()
+            .join("\n")
+            .trim()
+            .to_string()
+    })
 }
 
 pub fn parse_rating(e: ElementRef) -> Rating {

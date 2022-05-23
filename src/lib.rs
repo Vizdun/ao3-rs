@@ -17,7 +17,6 @@ mod tests {
         println!(
             "{:#?}",
             SearchQuery::builder()
-                .any("wonsan")
                 .build()
                 .collect::<Vec<WorkMetadata>>()
         )
