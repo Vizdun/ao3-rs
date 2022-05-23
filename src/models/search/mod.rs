@@ -15,6 +15,7 @@ use super::{
 };
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "strum", derive(strum::EnumIter))]
 pub enum SortDirection {
     Ascending,
     Descending,
@@ -27,6 +28,7 @@ impl Default for SortDirection {
 }
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "strum", derive(strum::EnumIter))]
 pub enum SortBy {
     BestMatch,
     Author,

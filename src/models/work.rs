@@ -21,6 +21,7 @@ pub struct NamedAuthor {
 }
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "strum", derive(strum::EnumIter))]
 /// Ratings
 pub enum Rating {
     /// Not Rated
@@ -51,6 +52,7 @@ impl TryFrom<&str> for Rating {
 }
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "strum", derive(strum::EnumIter))]
 /// Archive Warnings
 pub enum Warning {
     /// Creator Chose Not To Use Archive Warnings
@@ -86,6 +88,7 @@ impl TryFrom<&str> for Warning {
 }
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "strum", derive(strum::EnumIter))]
 /// Categories
 pub enum Category {
     /// F/F
