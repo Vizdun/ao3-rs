@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::language::Language;
 
 #[derive(Debug, Clone)]
@@ -51,6 +53,18 @@ impl TryFrom<&str> for Rating {
     }
 }
 
+impl Display for Rating {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Rating::NotRated => f.write_str("Not Rated"),
+            Rating::General => f.write_str("General Audiences"),
+            Rating::Teen => f.write_str("Teen And Up Audiences"),
+            Rating::Mature => f.write_str("Mature"),
+            Rating::Explicit => f.write_str("Explicit"),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "strum", derive(strum::EnumIter))]
 /// Archive Warnings
@@ -87,6 +101,19 @@ impl TryFrom<&str> for Warning {
     }
 }
 
+impl Display for Warning {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Warning::CreatorChoseNotToUseArchiveWarnings => f.write_str("Creator Chose Not To Use Archive Warnings"),
+            Warning::NoArchiveWarningsApply => f.write_str("No Archive Warnings Apply"),
+            Warning::GraphicDepictionsOfViolence => f.write_str("Graphic Depictions Of Violence"),
+            Warning::MajorCharacterDeath => f.write_str("Major Character Death"),
+            Warning::Underage => f.write_str("Underage"),
+            Warning::RapeNonCon => f.write_str("Rape/Non-Con"),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "strum", derive(strum::EnumIter))]
 /// Categories
@@ -117,6 +144,19 @@ impl TryFrom<&str> for Category {
             "Multi" => Ok(Category::Multi),
             "Other" => Ok(Category::Other),
             _ => Err(()),
+        }
+    }
+}
+
+impl Display for Category {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Category::FF => f.write_str("F/F"),
+            Category::FM => f.write_str("F/M"),
+            Category::Gen => f.write_str("Gen"),
+            Category::MM => f.write_str("M/M"),
+            Category::Multi => f.write_str("Multi"),
+            Category::Other => f.write_str("Other"),
         }
     }
 }
