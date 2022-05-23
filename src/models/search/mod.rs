@@ -1,6 +1,6 @@
 use std::{
     collections::{HashSet, VecDeque},
-    ops::Range,
+    ops::Range, fmt::Display,
 };
 
 use typed_builder::TypedBuilder;
@@ -27,6 +27,15 @@ impl Default for SortDirection {
     }
 }
 
+impl Display for SortDirection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SortDirection::Ascending => f.write_str("Ascending"),
+            SortDirection::Descending => f.write_str("Descending"),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "strum", derive(strum::EnumIter))]
 pub enum SortBy {
@@ -45,6 +54,23 @@ pub enum SortBy {
 impl Default for SortBy {
     fn default() -> Self {
         SortBy::BestMatch
+    }
+}
+
+impl Display for SortBy {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SortBy::BestMatch => f.write_str("Best Match"),
+            SortBy::Author => f.write_str("Author"),
+            SortBy::Title => f.write_str("Title"),
+            SortBy::DatePosted => f.write_str("Date Posted"),
+            SortBy::DateUpdated => f.write_str("Date Updated"),
+            SortBy::WordCount => f.write_str("Word Count"),
+            SortBy::Hits => f.write_str("Hits"),
+            SortBy::Kudos => f.write_str("Kudos"),
+            SortBy::Comments => f.write_str("Comments"),
+            SortBy::Bookmarks => f.write_str("Bookmarks"),
+        }
     }
 }
 
