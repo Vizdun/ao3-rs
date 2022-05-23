@@ -85,15 +85,10 @@ pub struct SearchQuery {
     pub author: String,
     #[builder(setter(into))]
     pub date: String,
-    #[builder(setter(strip_option))]
     pub completed: Option<bool>,
-    #[builder(setter(strip_option))]
     pub crossover: Option<bool>,
-    #[builder(!default, setter(strip_bool))]
     pub single_chapter: bool,
-    #[builder(setter(strip_option))]
     pub word_count: Option<Range<usize>>,
-    #[builder(setter(strip_option))]
     pub language: Option<Language>,
     #[builder(setter(into))]
     pub fandoms: HashSet<String>,
@@ -109,13 +104,9 @@ pub struct SearchQuery {
     pub relationships: HashSet<String>,
     #[builder(setter(into))]
     pub tags: HashSet<String>,
-    #[builder(setter(strip_option))]
     pub hits: Option<Range<usize>>,
-    #[builder(setter(strip_option))]
     pub kudos: Option<Range<usize>>,
-    #[builder(setter(strip_option))]
     pub comments: Option<Range<usize>>,
-    #[builder(setter(strip_option))]
     pub bookmarks: Option<Range<usize>>,
     pub sort_by: SortBy,
     pub sort_direction: SortDirection,
