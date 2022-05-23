@@ -24,5 +24,7 @@ mod tests {
     }
 }
 
-pub mod models;
+mod models;
 mod scrape;
+
+pub use models::*;

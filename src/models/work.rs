@@ -189,7 +189,7 @@ impl TryFrom<&str> for ChapterCount {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Metadata or the 'header' of a work
 pub struct WorkMetadata {
     /// ID
@@ -230,7 +230,7 @@ pub struct WorkMetadata {
     pub hits: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Chapter of a work
 pub struct Chapter {
     /// Title of the chapter
@@ -243,7 +243,7 @@ pub struct Chapter {
     pub end_notes: Option<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// A work
 pub struct Work {
     /// A struct containing information about the work's metadata

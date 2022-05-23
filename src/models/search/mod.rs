@@ -46,7 +46,7 @@ impl Default for SortBy {
     }
 }
 
-#[derive(Debug, Default, TypedBuilder)]
+#[derive(Debug, Default, TypedBuilder, Clone)]
 #[builder(field_defaults(default))]
 pub struct SearchQuery {
     #[builder(setter(into))]
