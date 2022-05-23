@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "strum", derive(EnumIter))]
+#[cfg_attr(feature = "strum", derive(strum::EnumIter))]
 pub enum Language {
     Somali,
     Afrikaans,
