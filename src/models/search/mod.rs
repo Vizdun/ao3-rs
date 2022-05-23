@@ -92,7 +92,6 @@ pub struct SearchQuery {
     pub language: Option<Language>,
     #[builder(setter(into))]
     pub fandoms: HashSet<String>,
-    #[builder(setter(strip_option))]
     pub rating: Option<Rating>,
     #[builder(setter(into))]
     pub warnings: HashSet<Warning>,
