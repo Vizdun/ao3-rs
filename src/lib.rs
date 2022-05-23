@@ -17,7 +17,7 @@ mod tests {
         println!(
             "{:#?}",
             SearchQuery::builder()
-                .tags(["Self-cest".to_string(), "Shameless Smut".to_string()])
+                .any("wonsan")
                 .build()
                 .collect::<Vec<WorkMetadata>>()
         )

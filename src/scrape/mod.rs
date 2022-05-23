@@ -96,13 +96,8 @@ pub(crate) use parse_try_into;
 macro_rules! parse_parse {
     ($e:expr) => {
         $e.next()
-            .unwrap()
-            .text()
-            .next()
-            .unwrap()
-            .to_string()
-            .parse()
-            .unwrap()
+            .map(|e| e.text().next().unwrap().to_string().parse().unwrap())
+            .unwrap_or(0)
     };
 }
 
